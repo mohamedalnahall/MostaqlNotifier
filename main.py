@@ -48,23 +48,18 @@ while True:
     for new_project in reversed(new_projects):
       title_anchor = new_project.find('.mrg--bt-reset', first=True).find('a', first=True)
       project_link = title_anchor.attrs["href"]
+      
+      project_page = session.get(project_link)
+      budget_range = project_page.html.find('td[data-type="project-budget_range"]', first=True).find('span', first=True).text
+      notification.notify(
+        title = title_anchor.text[0:63],
+        message = (budget_range + " " + new_project.find('p.project__brief', first=True).text)[0:255],
+        app_name ="Mostaql Notifier",
+        app_icon = None,
+        timeout = None,
+      )
 
-      try:
-        projects.index(project_link)
-        continue
-      except ValueError:                      
-        time.sleep(1)    
-        project_page = session.get(project_link)
-        budget_range = project_page.html.find('td[data-type="project-budget_range"]', first=True).find('span', first=True).text
-        notification.notify(
-          title = title_anchor.text[0:63],
-          message = (budget_range + " " + new_project.find('p.project__brief', first=True).text)[0:255],
-          app_name ="Mostaql Notifier",
-          app_icon = None,
-          timeout = None,
-        )
-
-        projects.append(project_link)
+      projects.append(project_link)
 
     projects = projects[max(0,len(projects)-25):len(projects)]  
 
