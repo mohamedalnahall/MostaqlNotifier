@@ -40,7 +40,7 @@ while True:
     new_projects = []
     for response_project in response_projects:
       try:
-        projects.index(response_project)
+        projects.index(response_project.find('.mrg--bt-reset', first=True).find('a', first=True).attrs["href"])
         break
       except ValueError: 
         new_projects.append(response_project)
