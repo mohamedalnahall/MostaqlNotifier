@@ -35,9 +35,18 @@ while True:
   try:
     response = session.get("https://mostaql.com/projects", params=config)
 
-    html_projects = response.html.find('.project-row')     
-    for html_project in reversed(html_projects):
-      title_anchor = html_project.find('.mrg--bt-reset', first=True).find('a', first=True)
+    response_projects = response.html.find('.project-row') 
+
+    new_projects = []
+    for response_project in response_projects:
+      try:
+        projects.index(response_project)
+        break
+      except ValueError: 
+        new_projects.append(response_project)
+
+    for new_project in reversed(new_projects):
+      title_anchor = new_project.find('.mrg--bt-reset', first=True).find('a', first=True)
       project_link = title_anchor.attrs["href"]
 
       try:
@@ -49,7 +58,7 @@ while True:
         budget_range = project_page.html.find('td[data-type="project-budget_range"]', first=True).find('span', first=True).text
         notification.notify(
           title = title_anchor.text[0:63],
-          message = (budget_range + " " + html_project.find('p.project__brief', first=True).text)[0:255],
+          message = (budget_range + " " + new_project.find('p.project__brief', first=True).text)[0:255],
           app_name ="Mostaql Notifier",
           app_icon = None,
           timeout = None,
@@ -57,7 +66,7 @@ while True:
 
         projects.append(project_link)
 
-    projects = projects[max(0,len(projects)-25):len(projects)]
+    projects = projects[max(0,len(projects)-25):len(projects)]  
 
     with open(cache_dir, "wb") as projects_cahche:
       pickle.dump(projects, projects_cahche)
