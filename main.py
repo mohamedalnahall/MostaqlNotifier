@@ -31,9 +31,21 @@ config = {
   "duration" : "0-6,7-14,15-30,31-90,91-100000"
 }
 
+offline = False
+
 while True:
   try:
     response = session.get("https://mostaql.com/projects", params=config)
+
+    if offline:
+      notification.notify(
+          title = 'Mostaql Notifier',
+          message = 'Connection Restored',
+          app_name ="Mostaql Notifier",
+          app_icon = None,
+          timeout = 10,
+          )
+      offline = False
 
     response_projects = response.html.find('.project-row') 
 
@@ -75,13 +87,15 @@ while True:
         timeout = 10,
         )
   except ConnectionError:
-    notification.notify(
-        title = 'Mostaql Notifier Error',
-        message = 'Connection Error',
-        app_name ="Mostaql Notifier",
-        app_icon = None,
-        timeout = 10,
-        )
+    if not offline:
+      notification.notify(
+          title = 'Mostaql Notifier',
+          message = 'Couldn\'t Connect to Mostaql, Please check your internet connection',
+          app_name ="Mostaql Notifier",
+          app_icon = None,
+          timeout = 10,
+          )
+      offline = True
   except RequestException:
     notification.notify(
         title = 'Mostaql Notifier Error',
@@ -90,8 +104,7 @@ while True:
         app_icon = None,
         timeout = 10,
         )
-  except Exception as e:
-    print(e)
+  except Exception:
     notification.notify(
         title = 'Mostaql Notifier Error',
         message = 'Somthing Went Wrong!!',
@@ -99,4 +112,7 @@ while True:
         app_icon = None,
         timeout = 10,
         )
-  time.sleep(60)
+  if offline:
+    time.sleep(2)
+  else:
+    time.sleep(60)
