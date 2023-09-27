@@ -5,7 +5,7 @@ Script to notify you when a new project is added on Mostaql
 Make sure to pip install the following packages:
  -  requests_html
  -  plyer
- -  platfromdirs
+ -  platformdirs
 
 ### To Make The Script Run at Startup in windows
 
